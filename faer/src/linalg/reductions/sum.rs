@@ -177,4 +177,17 @@ mod tests {
 		let target = 0.3 * 10000000.0f64;
 		assert!(relative_err(sum(mat.as_ref().as_mat()), target) < 1e-14);
 	}
+
+	#[test]
+	fn test_nan_sum() {
+		for (m, n) in [(9, 10), (1023, 5), (42, 1)] {
+			for factor in [0.0, 1.0, 1e30, 1e250, 1e-30, 1e-250] {
+				let mut mat = Mat::from_fn(m, n, |i, j| factor * ((i + j) as f64));
+                                // pollute matrix with nan
+                                mat[(2, 0)] = f64::NAN;
+                                // check that the sum is nan
+                                assert!(sum(mat.as_ref()).is_nan());
+			}
+		}
+	}
 }
